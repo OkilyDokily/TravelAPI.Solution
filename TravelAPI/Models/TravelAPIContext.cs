@@ -30,10 +30,43 @@ namespace TravelAPI.Models
          {
            ReviewId = 3,
            Rating = Rating.FIVE,
-           UserName = "Charles Barkely",
+           UserName = "Yolo Banksy",
            Country = "Australia",
            City = "Sydney"
          }
+         ,
+          new Review
+          {
+            ReviewId = 4,
+            Rating = Rating.FIVE,
+            UserName = "Kate Austen",
+            Country = "Australia",
+            City = "Sydney"
+          },
+           new Review
+           {
+             ReviewId = 5,
+             Rating = Rating.FIVE,
+             UserName = "Kaitlinn Bennet",
+             Country = "Australia",
+             City = "Sydney"
+           },
+            new Review
+            {
+              ReviewId = 6,
+              Rating = Rating.FIVE,
+              UserName = "Hosia",
+              Country = "Australia",
+              City = "Sydney"
+            },
+             new Review
+             {
+               ReviewId = 7,
+               Rating = Rating.FIVE,
+               UserName = "Charlie Bonkadonk",
+               Country = "Australia",
+               City = "Sydney"
+             }
      );
     }
     public virtual DbSet<Review> Reviews { get; set; }

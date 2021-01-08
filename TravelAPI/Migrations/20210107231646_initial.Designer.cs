@@ -8,8 +8,8 @@ using TravelAPI.Models;
 namespace TravelAPI.Migrations
 {
     [DbContext(typeof(TravelAPIContext))]
-    [Migration("20210104234415_inital")]
-    partial class inital
+    [Migration("20210107231646_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,13 +23,16 @@ namespace TravelAPI.Migrations
                     b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("City");
+                    b.Property<string>("City")
+                        .IsRequired();
 
-                    b.Property<string>("Country");
+                    b.Property<string>("Country")
+                        .IsRequired();
 
                     b.Property<int>("Rating");
 
-                    b.Property<string>("UserName");
+                    b.Property<string>("UserName")
+                        .IsRequired();
 
                     b.HasKey("ReviewId");
 
@@ -58,7 +61,39 @@ namespace TravelAPI.Migrations
                             City = "Sydney",
                             Country = "Australia",
                             Rating = 5,
-                            UserName = "Charles Barkely"
+                            UserName = "Yolo Banksy"
+                        },
+                        new
+                        {
+                            ReviewId = 4,
+                            City = "Sydney",
+                            Country = "Australia",
+                            Rating = 5,
+                            UserName = "Kate Austen"
+                        },
+                        new
+                        {
+                            ReviewId = 5,
+                            City = "Sydney",
+                            Country = "Australia",
+                            Rating = 5,
+                            UserName = "Kaitlinn Bennet"
+                        },
+                        new
+                        {
+                            ReviewId = 6,
+                            City = "Sydney",
+                            Country = "Australia",
+                            Rating = 5,
+                            UserName = "Hosia"
+                        },
+                        new
+                        {
+                            ReviewId = 7,
+                            City = "Sydney",
+                            Country = "Australia",
+                            Rating = 5,
+                            UserName = "Charlie Bonkadonk"
                         });
                 });
 #pragma warning restore 612, 618

@@ -15,10 +15,20 @@ namespace TravelAPI.Controllers
     {
       _db = db;
     }
-    // GET api/values
+    // GET api/Reviews
     [HttpGet]
-    public ActionResult<IEnumerable<Review>> Get(string country, string city)
+    public ActionResult<IEnumerable<Review>> Get(string country, string city, string option)
     {
+
+      if (option == "rating")
+      {
+        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList().GroupBy(x => x.Sum(xa => (int)xa.Rating) / x.Count()).OrderByDescending(x => x.Key).First().SelectMany(x => x).ToList();
+      }
+
+      if (option == "number")
+      {
+        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList().GroupBy(x => x.Count()).OrderByDescending(x => x.Key).First().SelectMany(x => x).ToList();
+      }
 
       if ((country != null) && (city != null))
       {
@@ -38,6 +48,21 @@ namespace TravelAPI.Controllers
       return _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
     }
 
+    [HttpGet]
+    [Route("/api/reviews/popular")]
+    public ActionResult<IEnumerable<string>> Get(string option)
+    {
+      if (option == "number")
+      {
+        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList().GroupBy(x => x.Count()).OrderByDescending(x => x.Key).SelectMany(x => new { Count = x.Key, Grouping = x }).Select(x => x.Count + x.Grouping.Key.Country + x.Key.City).ToList();
+      }
+      else if (option == "rating")
+      {
+        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList().GroupBy(x => x.Count()).OrderByDescending(x => x.Key).SelectMany(x => x.SelectMany(xa => xa)).Select(x => x.City + ", " + x.Country).ToList();
+      }
+      return new List<string>();
+    }
+
 
     // POST api/reviews
     [HttpPost]
@@ -46,21 +71,6 @@ namespace TravelAPI.Controllers
       Console.WriteLine(review.Rating);
       _db.Reviews.Add(review);
       _db.SaveChanges();
-    }
-
-    //api/reviews/MostPopular
-    [HttpGet]
-    public ActionResult<IEnumerable<Review>> MostPopular(string option)
-    {
-      if (option == "rating")
-      {
-        return _db.Reviews.OrderBy(x => x.Rating).ToList();
-      }
-      if (option == "number")
-      {
-        return _db.Reviews.OrderBy(x => x.Rating).ToList();
-      }
-      return _db.Reviews.OrderBy(x => x.Rating).ToList();
     }
 
     // PUT api/values/5
