@@ -54,11 +54,21 @@ namespace TravelAPI.Controllers
     {
       if (option == "number")
       {
-        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList().GroupBy(x => x.Count()).OrderByDescending(x => x.Key).SelectMany(x => new { Count = x.Key, Grouping = x }).Select(x => x.Count + x.Grouping.Key.Country + x.Key.City).ToList();
+        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList()
+       .GroupBy(x => x.Count()).
+       OrderByDescending(x => x.Key)
+       .SelectMany(x => x,
+             (countgroup, countrycitygroup) => $"{countrycitygroup.Key.City} {countrycitygroup.Key.Country} {countgroup.Key}")
+        .ToList();
       }
       else if (option == "rating")
       {
-        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList().GroupBy(x => x.Count()).OrderByDescending(x => x.Key).SelectMany(x => x.SelectMany(xa => xa)).Select(x => x.City + ", " + x.Country).ToList();
+        return _db.Reviews.GroupBy(x => new { x.Country, x.City }).ToList()
+        .GroupBy(x => x.Sum(xa => (int)xa.Rating) / x.Count()).
+        OrderByDescending(x => x.Key)
+        .SelectMany(x => x,
+              (countgroup, countrycitygroup) => $"{countrycitygroup.Key.City} {countrycitygroup.Key.Country} {countgroup.Key}")
+         .ToList();
       }
       return new List<string>();
     }
@@ -75,14 +85,26 @@ namespace TravelAPI.Controllers
 
     // PUT api/values/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public void Put(int id, [FromBody] string value, string user_name)
     {
+      Review review = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
+      if(user_name == review.UserName)
+      {
+        _db.Entry(review).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        _db.SaveChanges();
+      }
     }
 
     // DELETE api/values/5
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public void Delete(int id,string user_name)
     {
+      Review review  = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
+      if (user_name == review.UserName)
+      {
+        _db.Reviews.Remove(review);
+        _db.SaveChanges();
+      }
     }
   }
 }
