@@ -4,7 +4,6 @@ using System;
 using TravelAPI.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 
 namespace TravelAPI.Controllers
 {
@@ -13,8 +12,6 @@ namespace TravelAPI.Controllers
   public class ReviewsController : ControllerBase
   {
     private readonly TravelAPIContext _db;
-    public SignInManager<ApplicationUser> _signInManager;
-    public UserManager<ApplicationUser> _userManager;
     public ReviewsController(TravelAPIContext db)
     {
       _db = db;
@@ -44,6 +41,16 @@ namespace TravelAPI.Controllers
       }
 
       return _db.Reviews.ToList();
+    }
+
+    //Return random destination
+    [HttpGet]
+    [Route("/api/reviews/random")]
+    public ActionResult<string> Get()
+    {
+      Random rnd = new Random();
+      List<string> reviews = _db.Reviews.GroupBy(x => new { x.Country, x.City }).Select(x => $"{x.Key.City} {x.Key.Country}").ToList();
+      return reviews[rnd.Next(reviews.Count)];
     }
 
     [HttpGet("{id}")]
@@ -77,7 +84,6 @@ namespace TravelAPI.Controllers
       return new List<string>();
     }
 
-
     // POST api/reviews
     [HttpPost]
     public void Post([FromBody] Review review)
@@ -101,12 +107,10 @@ namespace TravelAPI.Controllers
       }
     }
 
-
     // DELETE api/values/5
     [HttpDelete("{id}")]
     public void Delete(int id, string user_name)
     {
-      Console.WriteLine(user_name);
       Review review = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
       if (user_name == review.UserName)
       {
