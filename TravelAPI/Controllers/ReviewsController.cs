@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using TravelAPI.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace TravelAPI.Controllers
 {
@@ -11,6 +13,8 @@ namespace TravelAPI.Controllers
   public class ReviewsController : ControllerBase
   {
     private readonly TravelAPIContext _db;
+    public SignInManager<ApplicationUser> _signInManager;
+    public UserManager<ApplicationUser> _userManager;
     public ReviewsController(TravelAPIContext db)
     {
       _db = db;
@@ -85,21 +89,25 @@ namespace TravelAPI.Controllers
 
     // PUT api/values/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value, string user_name)
+    public void Put(int id, [FromBody] Review review, string user_name)
     {
-      Review review = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
-      if(user_name == review.UserName)
+      Review detach = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
+      review.ReviewId = id;
+      if (user_name == detach.UserName)
       {
-        _db.Entry(review).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        _db.Entry(detach).State = EntityState.Detached;
+        _db.Entry(review).State = EntityState.Modified;
         _db.SaveChanges();
       }
     }
 
+
     // DELETE api/values/5
     [HttpDelete("{id}")]
-    public void Delete(int id,string user_name)
+    public void Delete(int id, string user_name)
     {
-      Review review  = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
+      Console.WriteLine(user_name);
+      Review review = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
       if (user_name == review.UserName)
       {
         _db.Reviews.Remove(review);
