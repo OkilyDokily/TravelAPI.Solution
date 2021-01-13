@@ -4,6 +4,8 @@ using System;
 using TravelAPI.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TravelAPI.Controllers
 {
