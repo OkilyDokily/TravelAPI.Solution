@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
 
 using TravelAPI.Models;
 
@@ -46,6 +47,20 @@ namespace TravelAPI
           IssuerSigningKey = new SymmetricSecurityKey
         (Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
         };
+      });
+
+      services.AddIdentity<ApplicationUser, IdentityRole>()
+      .AddEntityFrameworkStores<TravelAPIContext>()
+      .AddDefaultTokenProviders();
+
+      services.Configure<IdentityOptions>(options =>
+      {
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 0;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredUniqueChars = 0;
       });
     }
 

@@ -6,23 +6,32 @@ using System.IdentityModel.Tokens.Jwt;
 using System;
 using TravelAPI.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using TravelAPI.ViewModels;
 
 namespace TravelAPI.Controllers
 {
-
   [Route("api/[controller]")]
   [ApiController]
   public class SecurityController : ControllerBase
   {
     private readonly IConfiguration _config;
-    public SecurityController(IConfiguration configuration)
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly TravelAPIContext _db;
+    public SecurityController(IConfiguration configuration, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, TravelAPIContext db)
     {
       _config = configuration;
+      _userManager = userManager;
+      _signInManager = signInManager;
+      _db = db;
     }
     private string GenerateJWT()
     {
       var issuer = _config["Jwt:Issuer"];
-      Console.WriteLine(issuer);
       var audience = _config["Jwt:Audience"];
       var expiry = DateTime.Now.AddMinutes(120);
       var securityKey = new SymmetricSecurityKey
@@ -40,25 +49,12 @@ namespace TravelAPI.Controllers
       return stringToken;
     }
 
-    private bool ValidateUser(User loginDetails)
-    {
-      if (loginDetails.UserName == "User1" &&
-        loginDetails.Password == "pass$word")
-      {
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    }
-
     [HttpPost]
-    [Route("api/security/login")]
-    public IActionResult Login([FromBody] User loginDetails)
+    [Route("/api/security/login")]
+    public async Task<IActionResult> Login([FromBody] LoginViewModel loginDetails)
     {
-      bool result = ValidateUser(loginDetails);
-      if (result)
+      Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(loginDetails.Name, loginDetails.Password, isPersistent: true, lockoutOnFailure: false);
+      if (result.Succeeded)
       {
         var tokenString = GenerateJWT();
         return Ok(new { token = tokenString });
@@ -68,5 +64,24 @@ namespace TravelAPI.Controllers
         return Unauthorized();
       }
     }
+
+    [HttpPost]
+    [Route("/api/security/register")]
+    public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
+    {
+      ApplicationUser user = new ApplicationUser { UserName = model.Name };
+      IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+      if (result.Succeeded)
+      {
+        _db.SaveChanges();
+        return new OkObjectResult("Account created");
+      }
+      else
+      {
+        return new BadRequestObjectResult("Something went wrong account not created");
+      }
+    }
   }
 }
+
+ 

@@ -6,9 +6,11 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TravelAPI.Controllers
 {
+  [Authorize]
   [Route("api/[controller]")]
   [ApiController]
   public class ReviewsController : ControllerBase
@@ -90,7 +92,6 @@ namespace TravelAPI.Controllers
     [HttpPost]
     public void Post([FromBody] Review review)
     {
-      Console.WriteLine(review.Rating);
       _db.Reviews.Add(review);
       _db.SaveChanges();
     }
