@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
+using System;
 
 using TravelAPI.Models;
 
@@ -36,6 +37,7 @@ namespace TravelAPI
       (JwtBearerDefaults.AuthenticationScheme)
       .AddJwtBearer(options =>
       {
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
           ValidateIssuer = true,
@@ -81,7 +83,7 @@ namespace TravelAPI
       //app.UseHttpsRedirection();
       app.UseMvc();
 
-      
+
     }
   }
 }

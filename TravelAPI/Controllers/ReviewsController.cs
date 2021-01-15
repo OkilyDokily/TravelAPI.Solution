@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace TravelAPI.Controllers
 {
-  [Authorize]
   [Route("api/[controller]")]
   [ApiController]
   public class ReviewsController : ControllerBase
@@ -90,8 +90,11 @@ namespace TravelAPI.Controllers
 
     // POST api/reviews
     [HttpPost]
-    public void Post([FromBody] Review review)
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async void Post([FromBody] Review review)
     {
+      string token = await HttpContext.GetTokenAsync("access token");
+      Console.WriteLine(token);
       _db.Reviews.Add(review);
       _db.SaveChanges();
     }

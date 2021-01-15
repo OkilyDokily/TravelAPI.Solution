@@ -29,10 +29,10 @@ namespace TravelAPI.Controllers
       _signInManager = signInManager;
       _db = db;
     }
-    private string GenerateJWT()
+    private string GenerateJWT(string user)
     {
       var issuer = _config["Jwt:Issuer"];
-      var audience = _config["Jwt:Audience"];
+      var audience = user;
       var expiry = DateTime.Now.AddMinutes(120);
       var securityKey = new SymmetricSecurityKey
   (Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -54,15 +54,51 @@ namespace TravelAPI.Controllers
     public async Task<IActionResult> Login([FromBody] LoginViewModel loginDetails)
     {
       Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(loginDetails.Name, loginDetails.Password, isPersistent: true, lockoutOnFailure: false);
+      // var user = await _userManager.FindByNameAsync(loginDetails.Name);
+      // Console.WriteLine(user.UserName);
+      // var result = await _signInManager.UserManager.CheckPasswordAsync(user, loginDetails.Password);
+
       if (result.Succeeded)
       {
-        var tokenString = GenerateJWT();
+        var tokenString = GenerateJWT(loginDetails.Name);
         return Ok(new { token = tokenString });
       }
       else
       {
         return Unauthorized();
       }
+    }
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpGet]
+    public IActionResult Get()
+    {
+      List<Employee> data = new List<Employee>();
+      data.Add(new Employee()
+      {
+        EmployeeID = 1,
+        FirstName = "Nancy",
+        LastName = "Davolio"
+      });
+      data.Add(new Employee()
+      {
+        EmployeeID = 2,
+        FirstName = "Andrew",
+        LastName = "Smith"
+      });
+      data.Add(new Employee()
+      {
+        EmployeeID = 3,
+        FirstName = "Janet",
+        LastName = "Rollings"
+      });
+      return new ObjectResult(data);
+    }
+    public class Employee
+    {
+      public int EmployeeID { get; set; }
+      public string FirstName { get; set; }
+      public string LastName { get; set; }
     }
 
     [HttpPost]
@@ -84,4 +120,4 @@ namespace TravelAPI.Controllers
   }
 }
 
- 
+
