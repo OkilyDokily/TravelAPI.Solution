@@ -53,12 +53,11 @@ namespace TravelAPI.Controllers
     [Route("/api/security/login")]
     public async Task<IActionResult> Login([FromBody] LoginViewModel loginDetails)
     {
-      Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(loginDetails.Name, loginDetails.Password, isPersistent: true, lockoutOnFailure: false);
-      // var user = await _userManager.FindByNameAsync(loginDetails.Name);
-      // Console.WriteLine(user.UserName);
-      // var result = await _signInManager.UserManager.CheckPasswordAsync(user, loginDetails.Password);
+      // Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(loginDetails.Name, loginDetails.Password, isPersistent: true, lockoutOnFailure: false);
+      var user = await _userManager.FindByNameAsync(loginDetails.Name);
+      var result = await _signInManager.UserManager.CheckPasswordAsync(user, loginDetails.Password);
 
-      if (result.Succeeded)
+      if (result)
       {
         var tokenString = GenerateJWT(loginDetails.Name);
         return Ok(new { token = tokenString });

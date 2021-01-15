@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Text.Json;
+
 
 namespace TravelAPI.Controllers
 {
@@ -91,12 +96,19 @@ namespace TravelAPI.Controllers
     // POST api/reviews
     [HttpPost]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public async void Post([FromBody] Review review)
+    public void Post([FromBody] Review review)
     {
-      string token = await HttpContext.GetTokenAsync("access token");
-      Console.WriteLine(token);
+      review.UserName = ReturnPayloadObject().aud;
       _db.Reviews.Add(review);
       _db.SaveChanges();
+    }
+
+    private Payload ReturnPayloadObject()
+    {
+      string header = Request.Headers[HeaderNames.Authorization];
+      var payload = header.Split(" ")[1].Split(".")[1];
+      var jsonstring = Encoding.UTF8.GetString(Convert.FromBase64String(payload));
+      return JsonSerializer.Deserialize<Payload>(jsonstring);
     }
 
     // PUT api/values/5
@@ -115,10 +127,10 @@ namespace TravelAPI.Controllers
 
     // DELETE api/values/5
     [HttpDelete("{id}")]
-    public void Delete(int id, string user_name)
+    public void Delete(int id)
     {
       Review review = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
-      if (user_name == review.UserName)
+      if (ReturnPayloadObject().aud == review.UserName)
       {
         _db.Reviews.Remove(review);
         _db.SaveChanges();
