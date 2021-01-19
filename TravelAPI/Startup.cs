@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
-using System;
-
 using TravelAPI.Models;
 
 namespace TravelAPI
@@ -45,7 +43,6 @@ namespace TravelAPI
           ValidateLifetime = true,
           ValidateIssuerSigningKey = true,
           ValidIssuer = Configuration["Jwt:Issuer"],
-          //ValidAudience = Configuration["Jwt:Audience"],
           IssuerSigningKey = new SymmetricSecurityKey
         (Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
         };

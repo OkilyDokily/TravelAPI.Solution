@@ -4,12 +4,8 @@ using System;
 using TravelAPI.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Net.Http.Headers;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
 
@@ -98,27 +94,30 @@ namespace TravelAPI.Controllers
     [Authorize(AuthenticationSchemes = "Bearer")]
     public void Post([FromBody] Review review)
     {
-      review.UserName = ReturnPayloadObject().aud;
+      review.UserName = GetPayloadObject().aud;
       _db.Reviews.Add(review);
       _db.SaveChanges();
     }
 
-    private Payload ReturnPayloadObject()
+    private Payload GetPayloadObject()
     {
       string header = Request.Headers[HeaderNames.Authorization];
-      var payload = header.Split(" ")[1].Split(".")[1];
-      var jsonstring = Encoding.UTF8.GetString(Convert.FromBase64String(payload));
+      string payload = header.Split(" ")[1].Split(".")[1];
+      string jsonstring = Encoding.UTF8.GetString(Convert.FromBase64String(payload));
       return JsonSerializer.Deserialize<Payload>(jsonstring);
     }
 
     // PUT api/values/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] Review review, string user_name)
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public void Put(int id, [FromBody] Review review)
     {
       Review detach = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
-      review.ReviewId = id;
-      if (user_name == detach.UserName)
+      string username = GetPayloadObject().aud;
+      if (username == detach.UserName)
       {
+        review.ReviewId = id;
+        review.UserName = username;
         _db.Entry(detach).State = EntityState.Detached;
         _db.Entry(review).State = EntityState.Modified;
         _db.SaveChanges();
@@ -127,10 +126,11 @@ namespace TravelAPI.Controllers
 
     // DELETE api/values/5
     [HttpDelete("{id}")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public void Delete(int id)
     {
       Review review = _db.Reviews.FirstOrDefault(entry => entry.ReviewId == id);
-      if (ReturnPayloadObject().aud == review.UserName)
+      if (GetPayloadObject().aud == review.UserName)
       {
         _db.Reviews.Remove(review);
         _db.SaveChanges();

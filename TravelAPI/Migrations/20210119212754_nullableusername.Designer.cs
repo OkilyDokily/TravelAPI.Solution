@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TravelAPI.Models;
 
 namespace TravelAPI.Migrations
 {
     [DbContext(typeof(TravelAPIContext))]
-    partial class TravelAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20210119212754_nullableusername")]
+    partial class nullableusername
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,64 +194,6 @@ namespace TravelAPI.Migrations
                     b.HasKey("ReviewId");
 
                     b.ToTable("Reviews");
-
-                    b.HasData(
-                        new
-                        {
-                            ReviewId = 1,
-                            City = "Portland",
-                            Country = "USA",
-                            Rating = 3,
-                            UserName = "Pat Benatar"
-                        },
-                        new
-                        {
-                            ReviewId = 2,
-                            City = "Moskow",
-                            Country = "Russia",
-                            Rating = 4,
-                            UserName = "Pat Benatar"
-                        },
-                        new
-                        {
-                            ReviewId = 3,
-                            City = "Sydney",
-                            Country = "Australia",
-                            Rating = 5,
-                            UserName = "Yolo Banksy"
-                        },
-                        new
-                        {
-                            ReviewId = 4,
-                            City = "Sydney",
-                            Country = "Australia",
-                            Rating = 5,
-                            UserName = "Kate Austen"
-                        },
-                        new
-                        {
-                            ReviewId = 5,
-                            City = "Sydney",
-                            Country = "Australia",
-                            Rating = 5,
-                            UserName = "Kaitlinn Bennet"
-                        },
-                        new
-                        {
-                            ReviewId = 6,
-                            City = "Sydney",
-                            Country = "Australia",
-                            Rating = 5,
-                            UserName = "Hosia"
-                        },
-                        new
-                        {
-                            ReviewId = 7,
-                            City = "Sydney",
-                            Country = "Australia",
-                            Rating = 5,
-                            UserName = "Charlie Bonkadonk"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
