@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+thumbs.db
+.vscode/
+.vs/
+obj/
+.env
+bin/
+EnvironmentVariables.cs
