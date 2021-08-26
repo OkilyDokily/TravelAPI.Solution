@@ -14,6 +14,7 @@ namespace ReactTravelAPI
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -24,6 +25,15 @@ namespace ReactTravelAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                    builder =>
+                                    {
+                                        builder.WithOrigins("http://localhost:3000", "http://localhost:5001", "https://localhost:5001", "http://localhost:5004", "https://localhost:5004").AllowAnyHeader().AllowAnyMethod();
+                                    });
+            });
             services.AddDbContext<ReactTravelAPIContext>(opt =>
             opt.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options =>
@@ -76,6 +86,7 @@ namespace ReactTravelAPI
                 app.UseHsts();
             }
 
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseAuthentication();
             //app.UseHttpsRedirection();
             app.UseMvc();

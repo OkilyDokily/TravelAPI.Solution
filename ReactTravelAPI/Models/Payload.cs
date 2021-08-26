@@ -27,10 +27,6 @@ namespace ReactTravelAPI.Models
             return converted;
             //Thank you Kalten from stackoverflow for this code https://stackoverflow.com/questions/60404612/parse-jwt-token-to-get-the-payload-content-only-without-external-library-in-c-sh
         }
-
-      
-
-    
     }
 
 
